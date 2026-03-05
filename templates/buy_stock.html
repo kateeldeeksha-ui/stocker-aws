@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Buy Stock – Stocker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body class="app-body">
+  <nav class="navbar">
+    <div class="brand">📈 Stocker</div>
+    <div class="nav-links">
+      <a href="{{ url_for('dashboard_trader') }}">Dashboard</a>
+      <a href="{{ url_for('sell_stock_route') }}">Sell</a>
+      <a href="{{ url_for('logout') }}" class="btn-nav-outline">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <h1 class="page-title">Buy Stock</h1>
+
+    <div class="card" style="max-width:500px">
+      <form method="POST" action="{{ url_for('buy_stock_route') }}">
+        <div class="form-group">
+          <label>Select Stock</label>
+          <select name="stock_id" required onchange="updatePrice(this)">
+            <option value="">-- Choose a stock --</option>
+            {% for s in stocks %}
+            <option value="{{ s.id }}" data-price="{{ s.price }}"
+              {% if request.args.get('stock_id') == s.id %}selected{% endif %}>
+              {{ s.symbol }} – {{ s.name }} (${{ "%.2f"|format(s.price|float) }})
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Current Price</label>
+          <input type="text" id="currentPrice" value="—" disabled/>
+        </div>
+        <div class="form-group">
+          <label>Quantity</label>
+          <input type="number" name="quantity" id="quantity" min="1" value="1"
+                 required oninput="calcTotal()"/>
+        </div>
+        <div class="form-group">
+          <label>Estimated Total</label>
+          <input type="text" id="totalCost" value="—" disabled/>
+        </div>
+        <button type="submit" class="btn-primary full">✅ Buy Stock</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+  let currentPrice = 0;
+  function updatePrice(sel) {
+    const opt = sel.options[sel.selectedIndex];
+    currentPrice = parseFloat(opt.dataset.price) || 0;
+    document.getElementById('currentPrice').value = currentPrice ? '$' + currentPrice.toFixed(2) : '—';
+    calcTotal();
+  }
+  function calcTotal() {
+    const qty = parseInt(document.getElementById('quantity').value) || 0;
+    const tot = currentPrice * qty;
+    document.getElementById('totalCost').value = tot > 0 ? '$' + tot.toFixed(2) : '—';
+  }
+  </script>
+</body>
+</html>

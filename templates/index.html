@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Stocker – Cloud Stock Trading</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body class="landing-body">
+  <nav class="navbar">
+    <div class="brand">📈 Stocker</div>
+    <div class="nav-links">
+      <a href="{{ url_for('login') }}">Login</a>
+      <a href="{{ url_for('signup') }}" class="btn-nav">Sign Up</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <h1>Cloud-Native Stock<br/>Trading Platform</h1>
+    <p>Built with Flask &amp; AWS — Real-time trading, secure authentication, and portfolio tracking.</p>
+    <div class="hero-btns">
+      <a href="{{ url_for('signup') }}" class="btn-primary">Get Started</a>
+      <a href="{{ url_for('login') }}"  class="btn-outline">Login</a>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="feat"><span>🔒</span><h3>Secure Auth</h3><p>Encrypted passwords &amp; sessions</p></div>
+    <div class="feat"><span>⚡</span><h3>Real-Time Trading</h3><p>Buy &amp; sell stocks instantly</p></div>
+    <div class="feat"><span>📊</span><h3>Portfolio Tracking</h3><p>Monitor your investments</p></div>
+    <div class="feat"><span>☁️</span><h3>AWS Powered</h3><p>DynamoDB, EC2 &amp; SNS</p></div>
+  </section>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+      <div class="alert alert-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+</body>
+</html>

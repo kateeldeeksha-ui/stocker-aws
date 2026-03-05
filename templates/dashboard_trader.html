@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Trader Dashboard – Stocker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body class="app-body">
+  <nav class="navbar">
+    <div class="brand">📈 Stocker</div>
+    <div class="nav-links">
+      <a href="{{ url_for('dashboard_trader') }}">Dashboard</a>
+      <a href="{{ url_for('buy_stock_route') }}">Buy</a>
+      <a href="{{ url_for('sell_stock_route') }}">Sell</a>
+      <span class="nav-user">👤 {{ username }}</span>
+      <a href="{{ url_for('logout') }}" class="btn-nav-outline">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <h1 class="page-title">Welcome, {{ username }}! 👋</h1>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Holdings</div>
+        <div class="stat-val">{{ portfolio|length }} stocks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Transactions</div>
+        <div class="stat-val">{{ transactions|length }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Available Stocks</div>
+        <div class="stat-val">{{ stocks|length }}</div>
+      </div>
+    </div>
+
+    <!-- Portfolio -->
+    <div class="card">
+      <div class="card-header">
+        <h2>My Portfolio</h2>
+        <div>
+          <a href="{{ url_for('buy_stock_route') }}"  class="btn-primary">Buy Stock</a>
+          <a href="{{ url_for('sell_stock_route') }}" class="btn-danger">Sell Stock</a>
+        </div>
+      </div>
+      {% if portfolio %}
+      <table class="table">
+        <thead><tr><th>Symbol</th><th>Name</th><th>Quantity</th><th>Avg Price</th><th>Current Price</th><th>Market Value</th></tr></thead>
+        <tbody>
+          {% for p in portfolio %}
+          <tr>
+            <td><strong>{{ p.symbol }}</strong></td>
+            <td>{{ p.name }}</td>
+            <td>{{ p.quantity }}</td>
+            <td>${{ "%.2f"|format(p.average_price|float) }}</td>
+            <td>${{ "%.2f"|format(p.price) }}</td>
+            <td>${{ "%.2f"|format(p.market_value) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">No holdings yet. <a href="{{ url_for('buy_stock_route') }}">Buy your first stock!</a></div>
+      {% endif %}
+    </div>
+
+    <!-- Available Stocks -->
+    <div class="card">
+      <h2>Available Stocks</h2>
+      {% if stocks %}
+      <table class="table">
+        <thead><tr><th>Symbol</th><th>Name</th><th>Price</th><th>Sector</th><th>Action</th></tr></thead>
+        <tbody>
+          {% for s in stocks %}
+          <tr>
+            <td><strong>{{ s.symbol }}</strong></td>
+            <td>{{ s.name }}</td>
+            <td>${{ "%.2f"|format(s.price|float) }}</td>
+            <td>{{ s.sector or '—' }}</td>
+            <td><a href="{{ url_for('buy_stock_route') }}?stock_id={{ s.id }}" class="btn-sm">Buy</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">No stocks available yet.</div>
+      {% endif %}
+    </div>
+
+    <!-- Transactions -->
+    <div class="card">
+      <h2>Transaction History</h2>
+      {% if transactions %}
+      <table class="table">
+        <thead><tr><th>Date</th><th>Stock ID</th><th>Action</th><th>Qty</th><th>Price</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for t in transactions %}
+          <tr>
+            <td>{{ t.transaction_date[:19].replace('T',' ') }}</td>
+            <td>{{ t.stock_id[:8] }}...</td>
+            <td><span class="badge {{ 'badge-buy' if t.action == 'BUY' else 'badge-sell' }}">{{ t.action }}</span></td>
+            <td>{{ t.quantity }}</td>
+            <td>${{ "%.2f"|format(t.price|float) }}</td>
+            <td><span class="badge badge-done">{{ t.status }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">No transactions yet.</div>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

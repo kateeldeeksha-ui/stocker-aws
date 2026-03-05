@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sell Stock – Stocker</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body class="app-body">
+  <nav class="navbar">
+    <div class="brand">📈 Stocker</div>
+    <div class="nav-links">
+      <a href="{{ url_for('dashboard_trader') }}">Dashboard</a>
+      <a href="{{ url_for('buy_stock_route') }}">Buy</a>
+      <a href="{{ url_for('logout') }}" class="btn-nav-outline">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <h1 class="page-title">Sell Stock</h1>
+
+    <div class="card" style="max-width:500px">
+      {% if portfolio %}
+      <form method="POST" action="{{ url_for('sell_stock_route') }}">
+        <div class="form-group">
+          <label>Select Stock to Sell</label>
+          <select name="stock_id" required onchange="updateSellInfo(this)">
+            <option value="">-- Choose a stock --</option>
+            {% for p in portfolio %}
+            <option value="{{ p.stock_id }}"
+                    data-qty="{{ p.quantity }}"
+                    data-price="{{ p.price }}"
+                    data-sym="{{ p.symbol }}">
+              {{ p.symbol }} – {{ p.name }} (You own: {{ p.quantity }} shares @ ${{ "%.2f"|format(p.price) }})
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Available Shares</label>
+          <input type="text" id="availableShares" value="—" disabled/>
+        </div>
+        <div class="form-group">
+          <label>Quantity to Sell</label>
+          <input type="number" name="quantity" id="sellQty" min="1" value="1"
+                 required oninput="calcSellTotal()"/>
+        </div>
+        <div class="form-group">
+          <label>Estimated Return</label>
+          <input type="text" id="sellTotal" value="—" disabled/>
+        </div>
+        <button type="submit" class="btn-danger full">🔴 Sell Stock</button>
+      </form>
+      {% else %}
+      <div class="empty">
+        You have no stocks to sell. <a href="{{ url_for('buy_stock_route') }}">Buy some first!</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <script>
+  let sellPrice = 0, maxQty = 0;
+  function updateSellInfo(sel) {
+    const opt = sel.options[sel.selectedIndex];
+    sellPrice = parseFloat(opt.dataset.price) || 0;
+    maxQty    = parseInt(opt.dataset.qty) || 0;
+    document.getElementById('availableShares').value = maxQty || '—';
+    document.getElementById('sellQty').max = maxQty;
+    calcSellTotal();
+  }
+  function calcSellTotal() {
+    const qty = parseInt(document.getElementById('sellQty').value) || 0;
+    const tot = sellPrice * qty;
+    document.getElementById('sellTotal').value = tot > 0 ? '$' + tot.toFixed(2) : '—';
+  }
+  </script>
+</body>
+</html>
