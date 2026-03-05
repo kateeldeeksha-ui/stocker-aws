@@ -18,28 +18,14 @@ The system uses an **in-memory data structure to simulate a database**, and incl
 
 ## Project Structure
 
+```
 stocker-aws/
-│
-├── app.py                  # Main Flask application
-├── requirements.txt        # Python dependencies
-├── .env.example            # Environment variable template
-│
-├── templates/              # HTML templates
-│   ├── index.html
-│   ├── login.html
-│   ├── signup.html
-│   ├── dashboard_admin.html
-│   ├── dashboard_trader.html
-│   ├── buy_stock.html
-│   └── sell_stock.html
-│
+├── app.py
+├── requirements.txt
+├── templates/
 ├── static/
-│   └── css/
-│       └── style.css
-│
-└── aws_setup/              # AWS setup scripts
-    ├── create_tables.py
-    └── create_sns.py
+└── aws_setup/
+```
 
 ## Technologies Used
 - Python
